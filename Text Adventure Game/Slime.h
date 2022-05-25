@@ -2,9 +2,9 @@
 
 #include <string>
 
-//#include "Enemies.h"
+#include "Enemies.h"
 #include "Characters.h"
 
 void slimeConstructor(std::string& name, int& health, std::string newName = "Slime");
-void slimeOnDeath(Character& player, std::string slimeName);
-void slimeActionAI(Character& player, std::string slimeName);
+void slimeOnDeath(Character& player, Enemy& self);
+void slimeActionAI(Character& player, Enemy& self);

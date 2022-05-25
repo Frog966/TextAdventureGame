@@ -5,6 +5,12 @@
 
 #include "Enemies.h"
 
+// Hold data of each enemy in an encounter
+struct EnemyInfo {
+    std::string name;
+    EnemyTypeList type;
+};
+
 class Game {
 private:
     int currEncounter = 0; // Keeps track of current encounter. Init as 0 immediately for convenience
@@ -13,7 +19,7 @@ private:
     // A list of encounters
     // Each encounter is a list of enemies defined by their enemy type including bosses
     // Will be populated in SetUpEncounterList()
-    std::vector<std::vector<EnemyTypeList>> encounterList;
+    std::vector<std::vector<EnemyInfo>> encounterList;
 
     // A list of enemies
     // Will be populated in SetUpCurrEncounter();
@@ -33,6 +39,7 @@ private:
     void SetUpPlayer();
     void SetUpEncounterList();
     void SetUpCurrEncounter();
+    void TargetEnemySelect();
     void DoPlayerTurn();
     void DoEnemiesTurn();
     void CurrEncounterLoop();

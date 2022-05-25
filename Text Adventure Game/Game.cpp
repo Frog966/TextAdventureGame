@@ -23,13 +23,21 @@ void Game::SetIsFightingFalse() { isFighting = false; }
 // A randomizer can be considered here but requires design balancing
 // Multiple enemies can be added but take care to not overdo it
 void Game::SetUpEncounterList() {
+	auto ReturnEnemyInfo = [](EnemyTypeList type, std::string name = "") -> EnemyInfo {
+		EnemyInfo newEI;
+		newEI.name = name;
+		newEI.type = type;
+
+		return newEI;
+	};
+
 	encounterList = {
 		{
-			EnemyTypeList::Slime
+			ReturnEnemyInfo(EnemyTypeList::Slime)
 		},
 		{
-			EnemyTypeList::Slime
-		},
+			ReturnEnemyInfo(EnemyTypeList::BigSlime, "Blobbygrand the Great Slime")
+		}
 	};
 }
 
@@ -95,12 +103,14 @@ void Game::SetUpPlayer() {
 
 // Sets up current encounter
 void Game::SetUpCurrEncounter() {
-	std::vector<EnemyTypeList>& currEnemyTypeList = encounterList[currEncounter]; // Just a temp declaration for the current enemy type list for easier reading
+	std::vector<EnemyInfo>& currEnemyInfoList = encounterList[currEncounter]; // Just a temp declaration for the current enemy type list for easier reading
 
 	enemyList.clear(); // Empty the enemy list first
 
-	for (int i = 0; i < currEnemyTypeList.size(); ++i) {
-		enemyList.push_back(Enemy(currEnemyTypeList[i])); // Push a newly created enemy into enemyList
+	for (int i = 0; i < currEnemyInfoList.size(); ++i) {
+		EnemyInfo& currEI = currEnemyInfoList[i];
+
+		enemyList.push_back(Enemy(currEI.type, currEI.name)); // Push a newly created enemy into enemyList
 	}
 }
 
@@ -131,12 +141,20 @@ void Game::CheckEnemiesAfterTurn() {
 	//std::cout << std::endl;
 
 	for (int i = 0; i < enemyList.size(); ++i) {
+		Enemy& currEnemy = enemyList[i];
+
 		// If enemy is dead, add to dead vector. Else, add to alive vector
-		if (enemyList[i].getHealth() <= 0) {
-			enemyList[i].performOnDeath(currPlayer); // Perform this enemy's on-death action
+		if (currEnemy.getHealth() <= 0) {
+			currEnemy.performOnDeath(currPlayer); // Perform this enemy's on-death action
 		}
 		else {
-			alive.push_back(enemyList[i]);
+			// Reset enemy behaviour if guarding
+			//! TODO - Consider adding a function in Enemy class to handle this in the future similar to performRandomAction()?
+			if (currEnemy.getCurrEnemyBehaviour() == EnemyBehaviourList::Guard) {
+				currEnemy.setCurrEnemyBehaviour(EnemyBehaviourList::None);
+			}
+
+			alive.push_back(currEnemy);
 		}
 	}
 
@@ -154,12 +172,12 @@ void Game::CheckEnemiesAfterTurn() {
 }
 
 // Choose an enemy to attack here
-void TargetEnemySelect(std::vector<Enemy>& enemyList, Character& currPlayer) {
+void Game::TargetEnemySelect() {
 	int selectedEnemy = 0;
 	int enemyListSize = enemyList.size();
 
 	// Enemy selection
-	auto TargetEnemySelect = [&]() -> void {
+	auto TargetSelection = [&]() -> void {
 		std::cout << "Select which enemy you want to attack:" << std::endl;
 
 		// Choose which enemy to attack
@@ -184,7 +202,7 @@ void TargetEnemySelect(std::vector<Enemy>& enemyList, Character& currPlayer) {
 		std::cout << std::endl;
 	};
 
-	TargetEnemySelect();
+	TargetSelection();
 
 	// Error handling for last cin (selecting your target)
 	// Adding 1 to enemyListSize because of back button
@@ -204,7 +222,7 @@ void TargetEnemySelect(std::vector<Enemy>& enemyList, Character& currPlayer) {
 
 		clearCIn();
 
-		TargetEnemySelect();
+		TargetSelection();
 	}
 
 	// Using if/else because switch case requires a const int and therefore won't accept enemyListSize
@@ -217,6 +235,11 @@ void TargetEnemySelect(std::vector<Enemy>& enemyList, Character& currPlayer) {
 		int healthLoss = selectedEnemyObj.decreaseHealth(currPlayer.getAttack());
 
 		std::cout << "You attacked " << selectedEnemyObj.getName() << " for " << healthLoss << " damage." << std::endl << std::endl;
+
+		CheckEnemiesAfterTurn();
+	}
+	else { // If player doesn't want to attack, recur the player turn
+		DoPlayerTurn();
 	}
 }
 
@@ -235,6 +258,15 @@ void Game::DoPlayerTurn() {
 
 		std::cout << std::endl;
 	};
+
+	// Display all enemies and their HP
+	for (int i = 0; i < enemyList.size(); ++i) {
+		Enemy currEnemy = enemyList[i];
+
+		std::cout << currEnemy.getName() << " (HP: " << currEnemy.getHealth() << ")" << std::endl;
+	}
+
+	std::cout << std::endl;
 
 	PlayerActionSelection();
 
@@ -259,15 +291,16 @@ void Game::DoPlayerTurn() {
 
 	switch (selectedAction) {
 		case 1:
-			TargetEnemySelect(enemyList, currPlayer);
+			TargetEnemySelect();
 			break;
 		case 2:
 			currPlayer.setCurrPlayerBehaviour(PlayerBehaviourList::Guard); // Set Player's action to guard
 			std::cout << "You begin guarding..." << std::endl << std::endl;
+
+			CheckEnemiesAfterTurn();
+
 			break;
 	}
-
-	CheckEnemiesAfterTurn();
 }
 
 // Make every enemy perform their action for their turn
@@ -286,15 +319,6 @@ void Game::DoEnemiesTurn() {
 void Game::CurrEncounterLoop() {
 	while (isFighting) {
 		std::cout << "====================================================" << std::endl;
-
-		// Display all enemies and their HP
-		for (int i = 0; i < enemyList.size(); ++i) {
-			Enemy currEnemy = enemyList[i];
-
-			std::cout << currEnemy.getName() << " (HP: " << currEnemy.getHealth() << ")" << std::endl;
-		}
-
-		std::cout << std::endl;
 
 		DoPlayerTurn();
 		DoEnemiesTurn();
@@ -326,6 +350,7 @@ void Game::StartGame() {
 
 		SetIsFightingTrue(); // Set encounter loop bool to true
 
+		// Display a message for the last encounter of the game
 		if (currEncounter == encounterList.size() - 1) {
 			std::cout << "This seems to be the last room in the dungeon...";
 

@@ -127,6 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BigSlime.cpp" />
     <ClCompile Include="Characters.cpp" />
     <ClCompile Include="Enemies.cpp" />
     <ClCompile Include="Game.cpp" />
@@ -138,6 +139,7 @@
     <ClInclude Include="Characters.h" />
     <ClInclude Include="Enemies.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="BigSlime.h" />
     <ClInclude Include="Randomizers.h" />
     <ClInclude Include="Slime.h" />
   </ItemGroup>

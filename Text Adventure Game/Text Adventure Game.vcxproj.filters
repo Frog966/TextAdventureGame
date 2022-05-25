@@ -39,6 +39,9 @@
     <ClCompile Include="Randomizers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="BigSlime.cpp">
+      <Filter>Source Files\Enemies</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Characters.h">
@@ -55,6 +58,9 @@
     </ClInclude>
     <ClInclude Include="Game.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BigSlime.h">
+      <Filter>Header Files\Enemies</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
