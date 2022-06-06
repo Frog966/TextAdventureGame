@@ -133,10 +133,12 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Randomizers.cpp" />
     <ClCompile Include="Slime.cpp" />
+    <ClCompile Include="ClearScreen.cpp" />
     <ClCompile Include="Text Adventure Game.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Characters.h" />
+    <ClInclude Include="ClearScreen.h" />
     <ClInclude Include="Enemies.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="BigSlime.h" />

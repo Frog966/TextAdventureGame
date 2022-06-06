@@ -4,7 +4,9 @@
 
 // A string array containing all the player jobs
 // Enums are difficult to iterate and too much trouble to turn into lists for the job listing part of the game
-extern std::string jobList[1];
+extern std::string jobList[1] = {
+    "KNIGHT"
+};
 
 // A list of player actions that could last more than 1 turn
 enum class PlayerBehaviourList {

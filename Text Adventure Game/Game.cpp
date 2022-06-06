@@ -6,6 +6,7 @@
 #include "Game.h"
 #include "Enemies.h"
 #include "Characters.h"
+#include "ClearScreen.h"
 
 void clearCIn() {
 	std::cin.clear();
@@ -160,15 +161,6 @@ void Game::CheckEnemiesAfterTurn() {
 
 	// Redefine enemyList to only alive enemies
 	enemyList = alive;
-
-	// All enemies are dead
-	if (enemyList.size() <= 0) {
-		SetIsFightingFalse();
-		currEncounter++; // Progress currEncounter
-
-		std::cout << std::endl << "It seems you've defeated all the enemies here." << std::endl;
-		std::cout << "Moving on to the next area..." << std::endl;
-	}
 }
 
 // Choose an enemy to attack here
@@ -324,6 +316,21 @@ void Game::CurrEncounterLoop() {
 		DoEnemiesTurn();
 
 		std::cout << "====================================================" << std::endl << std::endl;
+
+		// If all enemies are dead
+		if (enemyList.size() <= 0) {
+			SetIsFightingFalse();
+			currEncounter++; // Progress currEncounter
+
+			// Pause for so player would maybe pay attention
+			clearCIn();
+			std::cout << "It seems you've defeated all the enemies here.";
+			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+			std::cout << "Moving on to the next area...";
+			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+			
+			ClearScreen(); // Clear the screen
+		}
 	}
 }
 
@@ -344,18 +351,21 @@ void Game::StartGame() {
 	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 	std::cout << std::endl;
 
+	ClearScreen(); // Clear the screen
+
 	// Player must fight through all encounters without dying to beat the game
 	while (currEncounter < encounterList.size() && currPlayer.getHealth() > 0) {
 		SetUpCurrEncounter(); // Instantiate the enemies first
 
 		SetIsFightingTrue(); // Set encounter loop bool to true
 
+		//ClearScreen(); // Clear the screen
+
 		// Display a message for the last encounter of the game
 		if (currEncounter == encounterList.size() - 1) {
 			std::cout << "This seems to be the last room in the dungeon...";
 
 			// Pause for so player would maybe pay attention
-			clearCIn();
 			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 			std::cout << std::endl;
 		}
