@@ -4,6 +4,10 @@
 
 #include "Characters.h"
 
+std::string jobList[1] = {
+    "KNIGHT"
+};
+
 // Constructor
 Character::Character(std::string _job) {
     // Uppercasing "_job" to avoid errors
